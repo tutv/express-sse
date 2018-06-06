@@ -83,7 +83,7 @@ app.get('/pull', (req, res) => {
             }, timeout * 1000);
         }
 
-        if (x > 10) {
+        if (x > 60) {
             res.end();
             EventServices.unsubscribe(onChange);
 
