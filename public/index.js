@@ -18,7 +18,6 @@
             // responseType: 'stream',
             onDownloadProgress: function (progressEvent) {
                 const {target, loaded} = progressEvent;
-
                 const {responseText} = target;
 
                 const text = (responseText + "").slice(startData);
@@ -36,6 +35,7 @@
                     .filter(response => response !== null);
 
                 const voteEvents = events.filter(event => event.type && event.type === 'vote');
+
                 voteEvents.forEach(event => {
                     const {data} = event;
 
@@ -43,7 +43,7 @@
                     $('#down').text(data.no);
                 });
 
-                startData = loaded;
+                startData = responseText.length || loaded;
             },
         }).then(response => {
             pulling();

@@ -60,7 +60,7 @@ app.get('/pull', (req, res) => {
 
     EventServices.subscribe(onChange);
 
-    res.set('Content-Type', 'application/json');
+    res.set('Content-Type', 'text/html; charset=utf-8');
     res.set('Cache-Control', 'no-cache');
     res.write(';');
     res.write(JSON.stringify({hello: x}) + ";");
