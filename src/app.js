@@ -13,11 +13,12 @@ app.use(express.static('public'));
 
 app.use(sse());
 app.use(cors());
+app.use(compression());
 
 const connections = [];
 const votes = {yes: 0, no: 0};
 
-app.get('/vote', compression(), function (req, res) {
+app.get('/vote', (req, res) => {
     req.query.yes === "true" ? votes.yes++ : votes.no++;
 
     for (let i = 0; i < connections.length; i++) {
@@ -60,8 +61,11 @@ app.get('/pull', (req, res) => {
     EventServices.subscribe(onChange);
 
     res.set('Content-Type', 'application/json');
+    res.set('Cache-Control', 'no-cache');
     res.write(';');
     res.write(JSON.stringify({hello: x}) + ";");
+    res.write(JSON.stringify({type: 'vote', data: votes}) + ";");
+    res.flush();
 
     req.on('close', function (err) {
         interval && clearInterval(interval);
@@ -69,10 +73,10 @@ app.get('/pull', (req, res) => {
         EventServices.unsubscribe(onChange);
     });
 
-
     const interval = setInterval(() => {
         x++;
         res.write(JSON.stringify({hello: x}) + ';');
+        res.flush();
         console.log('write', Date.now());
 
         if (x < 5) {
@@ -80,6 +84,7 @@ app.get('/pull', (req, res) => {
 
             setTimeout(() => {
                 res.write("hello" + ';');
+                res.flush();
             }, timeout * 1000);
         }
 
