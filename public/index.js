@@ -17,27 +17,34 @@
         axios.get('/pull', {
             // responseType: 'stream',
             onDownloadProgress: function (progressEvent) {
-                const {target, loaded} = progressEvent;
-                const {responseText} = target;
+                const target = progressEvent.target;
+                const loaded = progressEvent.loaded;
+
+                const responseText = target.responseText;
+
 
                 const text = (responseText + "").slice(startData);
                 const events = text.split(';')
-                    .map(response => {
+                    .map(function (response) {
                         return response.trim();
                     })
-                    .map(text => {
+                    .map(function (text) {
                         try {
                             return JSON.parse(text);
                         } catch (error) {
                             return null;
                         }
                     })
-                    .filter(response => response !== null);
+                    .filter(function (response) {
+                        return response !== null
+                    });
 
-                const voteEvents = events.filter(event => event.type && event.type === 'vote');
+                const voteEvents = events.filter(function (event) {
+                    return event.type && event.type === 'vote'
+                });
 
-                voteEvents.forEach(event => {
-                    const {data} = event;
+                voteEvents.forEach(function (event) {
+                    const data = event.data;
 
                     $('#up').text(data.yes);
                     $('#down').text(data.no);
@@ -45,16 +52,20 @@
 
                 startData = responseText.length || loaded;
             },
-        }).then(response => {
+        }).then(function (response) {
             pulling();
-        }).catch(error => {
+        }).catch(function (error) {
             console.error(error);
 
-            setTimeout(() => {
+            setTimeout(function () {
                 pulling();
             }, 1000);
         });
     }
 
-    pulling();
+    $(document).ready(function () {
+        setTimeout(function () {
+            pulling();
+        }, 0);
+    });
 })(jQuery, axios);
